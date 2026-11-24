@@ -1,0 +1,49 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (always install fresh inside container)
+node_modules
+frontend/node_modules
+backend/node_modules
+
+# Build outputs
+frontend/.next
+frontend/out
+backend/dist
+
+# Environment files and credentials (never leak into images)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.docker
+backend/.env
+backend/.env.local
+backend/.env.test
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+
+# Allow example templates
+!.env.example
+!.env.docker.example
+
+# Test artifacts & logs
+coverage
+test-results
+*.log
+npm-debug.log*
+
+# IDE and OS metadata
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+*.swp
+*.swo
+
+# Scratch files
+scratch
+browser_evidence

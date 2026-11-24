@@ -1,0 +1,131 @@
+// Prisma schema for Snack Overflow
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum SnackCategory {
+  SWEET
+  SAVOURY
+  DRINK
+  HEALTHY_ISH
+}
+
+enum ActivityAction {
+  CONSUMED
+  RESTOCKED
+}
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  name         String     @db.VarChar(100)
+  email        String     @unique @db.VarChar(255)
+  passwordHash String     @db.VarChar(255)
+  role         Role       @default(MEMBER)
+  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
+
+  votes           Vote[]
+  activities      Activity[]
+  sessions        Session[]
+  idempotencyKeys IdempotencyKey[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique @db.VarChar(64)
+  expiresAt DateTime  @db.Timestamptz(6)
+  revokedAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  userAgent String?   @db.VarChar(255)
+  ipAddress String?   @db.VarChar(45)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model Snack {
+  id                String        @id @default(uuid()) @db.Uuid
+  name              String        @unique @db.VarChar(120)
+  category          SnackCategory
+  quantity          Int           @default(0)
+  lowStockThreshold Int           @default(5)
+  createdAt         DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime      @updatedAt @db.Timestamptz(6)
+
+  votes             Vote[]
+  activities        Activity[]
+
+  @@index([category])
+  @@map("snacks")
+}
+
+model Vote {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  snackId   String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  snack     Snack    @relation(fields: [snackId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, snackId], name: "unique_user_snack_vote")
+  @@index([snackId])
+  @@map("votes")
+}
+
+model Activity {
+  id        String         @id @default(uuid()) @db.Uuid
+  userId    String         @db.Uuid
+  snackId   String?        @db.Uuid
+  snackName String         @db.VarChar(120)
+  action    ActivityAction
+  amount    Int
+  createdAt DateTime       @default(now()) @db.Timestamptz(6)
+
+  // Enforce audit integrity: Users with historical activity cannot be deleted
+  user      User           @relation(fields: [userId], references: [id], onDelete: Restrict)
+  // Preserves audit logs if a snack is deleted
+  snack     Snack?         @relation(fields: [snackId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt(sort: Desc)])
+  @@index([userId])
+  @@index([snackId])
+  @@map("activities")
+}
+
+model IdempotencyKey {
+  id           String    @id @default(uuid()) @db.Uuid
+  key          String    @db.VarChar(255)
+  userId       String    @db.Uuid
+  operation    String    @db.VarChar(100)
+  requestHash  String    @db.VarChar(64)
+  statusCode   Int?
+  responseBody String?   @db.Text
+  status       String    @default("PROCESSING") @db.VarChar(20)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
+  expiresAt    DateTime  @db.Timestamptz(6)
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key], name: "unique_user_idempotency_key")
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("idempotency_keys")
+}

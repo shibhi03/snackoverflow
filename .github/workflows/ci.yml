@@ -1,0 +1,121 @@
+name: Snack Overflow CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_test_password
+          POSTGRES_DB: snack_overflow
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      CI: true
+      DATABASE_URL: postgresql://ci_user:ci_test_password@localhost:5432/snack_overflow?schema=public
+      TEST_DATABASE_URL: postgresql://ci_user:ci_test_password@localhost:5432/snack_overflow_test?schema=public
+      PORT: 4000
+      NODE_ENV: test
+      JWT_SECRET: ci_jwt_secret_test_key_minimum_32_characters_long
+      FRONTEND_URL: http://localhost:3000
+      ENABLE_MEMBER_REGISTRATION: "true"
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+
+    steps:
+      # =================================================================
+      # Stage A: Checkout and dependency installation
+      # =================================================================
+      - name: "Stage A: Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Stage A: Set up Node.js 22"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: "Stage A: Install dependencies across monorepo"
+        run: npm ci
+
+      # =================================================================
+      # Stage B: Code quality checks (Linting & TypeScript Typechecking)
+      # =================================================================
+      - name: "Stage B: Generate Prisma Client for TypeScript definitions"
+        working-directory: backend
+        run: npx prisma generate
+
+      - name: "Stage B: Run backend ESLint"
+        run: npm run lint:backend
+
+      - name: "Stage B: Run frontend ESLint"
+        run: npm run lint:frontend
+
+      - name: "Stage B: Run backend TypeScript typecheck"
+        run: npm run typecheck:backend
+
+      - name: "Stage B: Run frontend TypeScript typecheck"
+        run: npm run typecheck:frontend
+
+      # =================================================================
+      # Stage C: Backend database integration and tests
+      # =================================================================
+      - name: "Stage C: Create isolated test database"
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          PGPASSWORD=ci_test_password psql -h localhost -U ci_user -d snack_overflow -c "CREATE DATABASE snack_overflow_test;"
+
+      - name: "Stage C: Apply Prisma migrations to CI databases"
+        working-directory: backend
+        run: |
+          npx prisma migrate deploy
+          DATABASE_URL="$TEST_DATABASE_URL" npx prisma migrate deploy
+
+      - name: "Stage C: Run backend test suite"
+        working-directory: backend
+        run: npm run test -- --no-file-parallelism --maxWorkers=1
+
+      # =================================================================
+      # Stage D: Frontend tests
+      # =================================================================
+      - name: "Stage D: Run frontend test suite"
+        run: npm run test:frontend
+
+      # =================================================================
+      # Stage E: Production builds
+      # =================================================================
+      - name: "Stage E: Build backend production bundle"
+        run: npm run build:backend
+
+      - name: "Stage E: Build frontend production bundle"
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_API_URL: http://localhost:4000/api
+        run: npm run build:frontend

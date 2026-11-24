@@ -1,0 +1,39 @@
+{
+  "name": "snack-overflow-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Snack Overflow - Office Pantry & Snack Inventory System",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev": "npm run dev:backend",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "lint:backend": "npm --prefix backend run lint",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "typecheck:backend": "npm --prefix backend run typecheck",
+    "typecheck:frontend": "npm --prefix frontend run typecheck",
+    "typecheck": "npm run typecheck:backend && npm run typecheck:frontend",
+    "format": "npm --prefix frontend exec -- prettier --write \"backend/src/**/*.ts\" \"backend/prisma/seed.ts\" \"frontend/src/**/*.{ts,tsx}\"",
+    "test:backend": "npm --prefix backend run test",
+    "test:frontend": "npm --prefix frontend run test",
+    "test": "npm run test:backend && npm run test:frontend"
+  },
+  "keywords": [
+    "snack-overflow",
+    "inventory",
+    "pantry",
+    "concurrency",
+    "nextjs",
+    "express",
+    "prisma",
+    "postgresql"
+  ],
+  "license": "UNLICENSED"
+}

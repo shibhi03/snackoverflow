@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Urbanist", system-ui, -apple-system, sans-serif;
+    --font-mono: "Share Tech Mono", ui-monospace, SFMono-Regular, monospace;
+    --pantry-bg: #EDECEC;
+    --pantry-surface: #F4F4F5;
+    --pantry-elevated: #FFFFFF;
+    --pantry-border: #D4D4D8;
+    --pantry-subtle: #FAFAFA;
+    --pantry-text: #09090B;
+    --pantry-muted: #71717A;
+    --brand: #FD3A25;
+  }
+
+  .dark {
+    --pantry-bg: #09090B;
+    --pantry-surface: #18181B;
+    --pantry-elevated: #27272A;
+    --pantry-border: #3F3F46;
+    --pantry-subtle: #1F1F23;
+    --pantry-text: #FAFAFA;
+    --pantry-muted: #A1A1AA;
+    --brand: #FD3A25;
+  }
+
+  body {
+    background-color: var(--pantry-bg);
+    color: var(--pantry-text);
+    font-family: var(--font-sans), 'Urbanist', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+@layer components {
+  /* TechOrdan-inspired tactile soft-3D light card */
+  .ordan-card {
+    background-color: var(--pantry-surface);
+    border: 1px solid var(--pantry-border);
+    box-shadow:
+      0px 7.77px 16px 0px rgba(0, 0, 0, 0.055),
+      0px 3px 3px 0px rgba(0, 0, 0, 0.075),
+      0px -6px 0px 0px rgba(0, 0, 0, 0.045) inset,
+      0px 3px 0px 0px rgba(255, 255, 255, 0.65) inset;
+  }
+
+  .dark .ordan-card {
+    box-shadow:
+      0px 10px 24px 0px rgba(0, 0, 0, 0.4),
+      0px -4px 0px 0px rgba(0, 0, 0, 0.35) inset,
+      0px 1px 0px 0px rgba(255, 255, 255, 0.06) inset;
+  }
+
+  /* High-contrast obsidian feature card */
+  .ordan-card-dark {
+    background:
+      radial-gradient(75% 65% at 25% 0%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%),
+      #09090B;
+    border: 1px solid #27272A;
+    box-shadow:
+      0px 16px 32px rgba(0, 0, 0, 0.18),
+      0px -4px 0px rgba(46, 46, 46, 0.8) inset,
+      0px 1px 0px rgba(255, 255, 255, 0.14) inset;
+  }
+
+  /* Primary dark tactile pill button */
+  .ordan-btn-dark {
+    background:
+      radial-gradient(62.56% 62.56% at 28.14% -10.42%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 100%),
+      #272727;
+    color: #FFFFFF;
+    box-shadow:
+      0px 10px 24px rgba(0, 0, 0, 0.16),
+      0px -3px 0px #080808 inset,
+      0px 1px 0px rgba(255, 255, 255, 0.3) inset;
+  }
+
+  .ordan-btn-dark:hover:not(:disabled) {
+    background:
+      radial-gradient(62.56% 62.56% at 28.14% -10.42%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 100%),
+      #1C1C1E;
+  }
+
+  /* Secondary light tactile pill button */
+  .ordan-btn-light {
+    background-color: #F5F5F5;
+    color: #09090B;
+    border: 1px solid #D4D4D8;
+    box-shadow:
+      0px 4px 10px rgba(0, 0, 0, 0.05),
+      0px -3px 0px #E4E4E7 inset,
+      0px 2px 0px rgba(255, 255, 255, 0.8) inset;
+  }
+
+  .ordan-btn-light:hover:not(:disabled) {
+    color: #FD3A25;
+    border-color: rgba(253, 58, 37, 0.35);
+  }
+
+  .dark .ordan-btn-light {
+    background-color: #27272A;
+    color: #FAFAFA;
+    border-color: #3F3F46;
+    box-shadow:
+      0px 4px 12px rgba(0, 0, 0, 0.3),
+      0px -3px 0px #18181B inset,
+      0px 1px 0px rgba(255, 255, 255, 0.08) inset;
+  }
+
+  .dark .ordan-btn-light:hover:not(:disabled) {
+    color: #FD3A25;
+  }
+
+  /* Brand fiery coral-red gradient button with ambient glow */
+  .ordan-btn-brand {
+    background: linear-gradient(180deg, #EA2B16 0%, #FF3B26 100%);
+    color: #FFFFFF;
+    box-shadow:
+      0px 12px 28px rgba(253, 58, 37, 0.28),
+      0px -3px 0px rgba(130, 14, 4, 0.45) inset,
+      0px 1px 0px rgba(255, 255, 255, 0.38) inset;
+  }
+
+  .ordan-btn-brand:hover:not(:disabled) {
+    filter: brightness(1.06);
+    box-shadow:
+      0px 14px 32px rgba(253, 58, 37, 0.38),
+      0px -3px 0px rgba(130, 14, 4, 0.45) inset,
+      0px 1px 0px rgba(255, 255, 255, 0.48) inset;
+  }
+
+  /* Coral icon badge with ambient warm glow */
+  .ordan-icon-glow {
+    background: linear-gradient(180deg, #EA2B16 0%, #FF3B26 100%);
+    color: #FFFFFF;
+    box-shadow:
+      0px 14px 30px rgba(255, 59, 0, 0.32),
+      0px 4px 10px rgba(255, 59, 0, 0.18),
+      0px 2px 0px rgba(255, 255, 255, 0.35) inset;
+  }
+
+  /* Floating glassmorphic navigation pill */
+  .ordan-glass-nav {
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(44px);
+    -webkit-backdrop-filter: blur(44px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+      0px 12px 32px rgba(0, 0, 0, 0.06),
+      0px 2px 6px rgba(0, 0, 0, 0.04),
+      0px 1px 0px rgba(255, 255, 255, 0.9) inset;
+  }
+
+  .dark .ordan-glass-nav {
+    background: rgba(24, 24, 27, 0.72);
+    border: 1px solid rgba(63, 63, 70, 0.7);
+    box-shadow:
+      0px 12px 32px rgba(0, 0, 0, 0.45),
+      0px 1px 0px rgba(255, 255, 255, 0.08) inset;
+  }
+
+  /* Eyebrow pill with coral indicator dot */
+  .ordan-eyebrow {
+    background-color: #F5F5F5;
+    color: #FD3A25;
+    border: 1px solid #E4E4E7;
+    box-shadow:
+      0px -2px 0px #E9E9E9 inset,
+      0px 1px 0px rgba(255, 255, 255, 0.8) inset;
+  }
+
+  .dark .ordan-eyebrow {
+    background-color: #18181B;
+    color: #FD3A25;
+    border-color: #3F3F46;
+    box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.06) inset;
+  }
+
+  /* Hairline gradient divider */
+  .ordan-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(212, 212, 216, 0) 0%, #D4D4D8 50%, rgba(212, 212, 216, 0) 100%);
+  }
+
+  .dark .ordan-divider {
+    background: linear-gradient(90deg, rgba(63, 63, 70, 0) 0%, #3F3F46 50%, rgba(63, 63, 70, 0) 100%);
+  }
+
+  /* Gradient display text */
+  .ordan-heading-gradient {
+    background: linear-gradient(132.09deg, #43484D 11.15%, #09090B 79.01%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dark .ordan-heading-gradient {
+    background: linear-gradient(132.09deg, #FFFFFF 11.15%, #A1A1AA 85%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Ambient mesh hero canvas */
+  .ordan-mesh-bg {
+    background:
+      radial-gradient(ellipse 60% 50% at 85% 10%, rgba(253, 58, 37, 0.16) 0%, transparent 65%),
+      radial-gradient(ellipse 55% 45% at 12% 88%, rgba(9, 9, 11, 0.08) 0%, transparent 60%),
+      var(--pantry-bg);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(253, 58, 37, 0.65);
+}
